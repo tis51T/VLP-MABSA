@@ -1,3 +1,7 @@
 data/
 !src/data/
 checkpoint/
+__pycache__/
+15_aesc/
+15_sc/
+15_ae/

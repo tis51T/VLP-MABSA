@@ -1,5 +1,5 @@
 from typing import Optional, Tuple
-from fastNLP.modules import Seq2SeqEncoder, Seq2SeqDecoder, State
+from fastNLP.modules.torch import State
 import torch
 import torch.nn.functional as F
 from torch import nn

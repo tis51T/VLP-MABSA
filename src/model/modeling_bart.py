@@ -23,9 +23,33 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 from torch.nn import CrossEntropyLoss
-from transformers.modeling_bart import *
+# from transformers.modeling_bart import *
+from transformers.modeling_outputs import BaseModelOutputWithPast, BaseModelOutput
+from transformers import PreTrainedModel, BartConfig
+from transformers.utils.doc import (
+    add_start_docstrings,
+    add_code_sample_docstrings,
+    replace_return_docstrings,
+    add_end_docstrings,
+)
 
-# from transformer_my.modeling_bart import *
+from transformers.modeling_outputs import (
+    BaseModelOutputWithPast,
+    BaseModelOutput,
+    Seq2SeqModelOutput,
+    Seq2SeqLMOutput,
+    Seq2SeqSequenceClassifierOutput,
+    Seq2SeqQuestionAnsweringModelOutput,
+)
+
+ACT2FN = {
+    "relu": F.relu,
+    "gelu": F.gelu,
+    "glu": F.glu,
+    "gelu_new": lambda x: x * 0.5 * (1.0 + torch.tanh(
+        torch.sqrt(2.0 / torch.pi) * (x + 0.044715 * torch.pow(x, 3)))),
+    # Add more if your config uses other activations
+}
 
 # logger = logging.get_logger(__name__)
 
@@ -194,11 +218,16 @@ class PretrainedBartModel(PreTrainedModel):
         }
         return dummy_inputs
 
-
 def _make_linear_from_emb(emb):
+    if emb.weight.is_meta:
+        # Return None if weights are not loaded yet
+        return None
+    vocab_size, emb_size = emb.weight.shape
     vocab_size, emb_size = emb.weight.shape
     lin_layer = nn.Linear(vocab_size, emb_size, bias=False)
+    lin_layer = nn.Linear(emb_size, vocab_size, bias=False)
     lin_layer.weight.data = emb.weight.data
+    lin_layer.weight.data = emb.weight.data.clone().to(dtype=lin_layer.weight.data.dtype, device=lin_layer.weight.data.device)
     return lin_layer
 
 
@@ -306,20 +335,16 @@ class BartEncoder(nn.Module):
         self.max_source_positions = config.max_position_embeddings
 
         self.embed_tokens = embed_tokens
-        if config.static_position_embeddings:
-            self.embed_positions = SinusoidalPositionalEmbedding(
-                config.max_position_embeddings, embed_dim, self.padding_idx)
-        else:
-            self.embed_positions = LearnedPositionalEmbedding(
-                config.max_position_embeddings,
-                embed_dim,
-                self.padding_idx,
-                config.extra_pos_embeddings,
-            )
+        self.embed_positions = LearnedPositionalEmbedding(
+            config.max_position_embeddings,
+            embed_dim,
+            self.padding_idx,
+            offset=2
+        )
         self.layers = nn.ModuleList(
             [EncoderLayer(config) for _ in range(config.encoder_layers)])
         self.layernorm_embedding = LayerNorm(
-            embed_dim) if config.normalize_embedding else nn.Identity()
+            embed_dim) if config.scale_embedding else nn.Identity()
         # mbart has one extra layer_norm
         self.layer_norm = LayerNorm(
             config.d_model) if config.add_final_layer_norm else None
@@ -500,25 +525,21 @@ class BartDecoder(nn.Module):
         super().__init__()
         self.dropout = config.dropout
         self.layerdrop = config.decoder_layerdrop
-        self.do_blenderbot_90_layernorm = config.do_blenderbot_90_layernorm  # layernorm variant
+        self.do_blenderbot_90_layernorm = getattr(config, "do_blenderbot_90_layernorm", False)  # layernorm variant  # layernorm variant
         self.padding_idx = embed_tokens.padding_idx
         self.max_target_positions = config.max_position_embeddings
         self.embed_scale = math.sqrt(
             config.d_model) if config.scale_embedding else 1.0
         self.embed_tokens = embed_tokens
-        if config.static_position_embeddings:
-            self.embed_positions = SinusoidalPositionalEmbedding(
-                config.max_position_embeddings, config.d_model,
-                config.pad_token_id)
-        else:
-            self.embed_positions = LearnedPositionalEmbedding(
-                config.max_position_embeddings, config.d_model,
-                self.padding_idx, config.extra_pos_embeddings)
+        self.embed_positions = LearnedPositionalEmbedding(
+            config.max_position_embeddings, config.d_model,
+            self.padding_idx, offset=2)         
+            
         self.layers = nn.ModuleList([
             DecoderLayer(config) for _ in range(config.decoder_layers)
         ])  # type: List[DecoderLayer]
         self.layernorm_embedding = LayerNorm(
-            config.d_model) if config.normalize_embedding else nn.Identity()
+            config.d_model) if config.scale_embedding else nn.Identity()
         self.layer_norm = LayerNorm(
             config.d_model) if config.add_final_layer_norm else None
         self.config = config
@@ -1103,9 +1124,9 @@ class BartModel(PretrainedBartModel):
 
         self.init_weights()
 
-    @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
+    # @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
+        # tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="facebook/bart-large",
         output_type=Seq2SeqModelOutput,
         config_class=_CONFIG_FOR_DOC,
@@ -1246,7 +1267,7 @@ class BartForConditionalGeneration(PretrainedBartModel):
             new_bias = torch.cat([self.final_logits_bias, extra_bias], dim=1)
         self.register_buffer("final_logits_bias", new_bias)
 
-    @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
+    # @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
     @replace_return_docstrings(output_type=Seq2SeqLMOutput,
                                config_class=_CONFIG_FOR_DOC)
     @add_end_docstrings(BART_GENERATION_EXAMPLE)
@@ -1419,9 +1440,9 @@ class BartForSequenceClassification(PretrainedBartModel):
         self.model._init_weights(self.classification_head.dense)
         self.model._init_weights(self.classification_head.out_proj)
 
-    @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
+    # @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
+        # tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="facebook/bart-large",
         output_type=Seq2SeqSequenceClassifierOutput,
         config_class=_CONFIG_FOR_DOC,
@@ -1508,9 +1529,9 @@ class BartForQuestionAnswering(PretrainedBartModel):
 
         self.model._init_weights(self.qa_outputs)
 
-    @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
+    # @add_start_docstrings_to_callable(BART_INPUTS_DOCSTRING)
     @add_code_sample_docstrings(
-        tokenizer_class=_TOKENIZER_FOR_DOC,
+        # tokenizer_class=_TOKENIZER_FOR_DOC,
         checkpoint="facebook/bart-large",
         output_type=Seq2SeqQuestionAnsweringModelOutput,
         config_class=_CONFIG_FOR_DOC,

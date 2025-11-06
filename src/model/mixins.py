@@ -7,20 +7,18 @@ import torch
 from torch import nn
 from torch.nn import Parameter
 
-from transformers.generation_utils import logger, Iterable
-from transformers.modeling_bart import (
-    _reorder_buffer,
-    _make_linear_from_emb
-)
+from typing import Iterable
+import logging as logger
+
 from transformers.modeling_utils import (
-    hf_bucket_url,
-    cached_path,
     TF2_WEIGHTS_NAME,
     WEIGHTS_NAME,
     TF_WEIGHTS_NAME,
     is_remote_url,
     PretrainedConfig
 )
+
+from transformers.utils.hub import cached_file, hf_hub_url
 
 
 # This is based on transformers.generation_utils
@@ -693,22 +691,27 @@ class FromPretrainedMixin:
                 )
                 archive_file = pretrained_model_name_or_path + ".index"
             else:
-                archive_file = hf_bucket_url(
-                    pretrained_model_name_or_path,
+                archive_file = hf_hub_url(
+                    repo_id=pretrained_model_name_or_path,
                     filename=(TF2_WEIGHTS_NAME if from_tf else WEIGHTS_NAME),
-                    use_cdn=use_cdn,
                 )
 
             try:
                 # Load from URL or cache if already cached
-                resolved_archive_file = cached_path(
-                    archive_file,
-                    cache_dir=cache_dir,
-                    force_download=force_download,
-                    proxies=proxies,
-                    resume_download=resume_download,
-                    local_files_only=local_files_only,
-                )
+                if os.path.isfile(archive_file) or is_remote_url(archive_file):
+                    # For local files or direct URLs, use the archive_file directly
+                    resolved_archive_file = archive_file
+                else:
+                    # For HuggingFace Hub models, use cached_file
+                    resolved_archive_file = cached_file(
+                        pretrained_model_name_or_path,
+                        (TF2_WEIGHTS_NAME if from_tf else WEIGHTS_NAME),
+                        cache_dir=cache_dir,
+                        force_download=force_download,
+                        proxies=proxies,
+                        resume_download=resume_download,
+                        local_files_only=local_files_only,
+                    )
                 if resolved_archive_file is None:
                     raise EnvironmentError
             except EnvironmentError:

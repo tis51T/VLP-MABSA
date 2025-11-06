@@ -2,11 +2,27 @@ r"""undocumented"""
 
 import torch
 from torch import nn
-from fastNLP.models.seq2seq_model import Seq2SeqModel
-from fastNLP.modules.decoder.seq2seq_decoder import Seq2SeqDecoder, State
+
+from fastNLP.models.torch.seq2seq_model import Seq2SeqModel
+from fastNLP.modules.torch.decoder import Seq2SeqDecoder
 import torch.nn.functional as F
-from fastNLP.core.utils import _get_model_device
 from functools import partial
+
+def _get_model_device(model):
+    r"""
+    传入一个nn.Module的模型，获取它所在的device
+
+    :param model: nn.Module
+    :return: torch.device,None 如果返回值为None，说明这个模型没有任何参数。
+    """
+    # TODO 这个函数存在一定的风险，因为同一个模型可能存在某些parameter不在显卡中，比如BertEmbedding. 或者跨显卡
+    assert isinstance(model, nn.Module)
+
+    parameters = list(model.parameters())
+    if len(parameters) == 0:
+        return None
+    else:
+        return parameters[0].device
 
 
 class SequenceGeneratorModel(nn.Module):

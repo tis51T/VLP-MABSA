@@ -4,7 +4,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers.modeling_bart import *
+from transformers.models.bart.modeling_bart import *
 from src.model.modeling_bart import (
     SinusoidalPositionalEmbedding,
     LearnedPositionalEmbedding,
@@ -17,6 +17,7 @@ from src.model.modeling_bart import (PretrainedBartModel, BartDecoder,
                                      _make_linear_from_emb,
                                      _prepare_bart_decoder_inputs)
 from src.model.config import MultiModalBartConfig
+from transformers.modeling_outputs import BaseModelOutput
 
 
 class ImageEmbedding(nn.Module):
@@ -273,8 +274,7 @@ class MultiModalBartDecoder_span(nn.Module
             tag_scores = F.linear(
                 hidden_state,
                 self.dropout_layer(
-                    self.decoder.embed_tokens.weight[self.label_start_id:self.
-                                                     label_end_id])
+                    self.decoder.embed_tokens.weight[self.label_start_id:self.label_start_id + self.src_start_index - 2])
             )  # bsz x max_len x num_class
             logits[:, :, 2:self.src_start_index] = tag_scores
         if not only_sc:

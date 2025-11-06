@@ -10,7 +10,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, ConcatDataset
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.tensorboard import SummaryWriter
-from transformers import AdamW
+from torch.optim import AdamW
 import random
 from src.data.collation import Collator
 from src.data.dataset import MVSA_Dataset, Twitter_Dataset

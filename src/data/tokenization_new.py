@@ -50,10 +50,8 @@ class ConditionTokenizer:
             aesc_token, pos_token, neu_token, neg_token, ae_oe_token, sep_token,
              ae_token, sc_token
         ]
-        unique_no_split_tokens = self._base_tokenizer.unique_no_split_tokens
-        self._base_tokenizer.unique_no_split_tokens = unique_no_split_tokens + self.additional_special_tokens
-        self.unique_no_split_tokens = self._base_tokenizer.unique_no_split_tokens
-
+        self._base_tokenizer.add_special_tokens({'additional_special_tokens': self.additional_special_tokens})
+        self.unique_no_split_tokens = self._base_tokenizer.additional_special_tokens
         self._base_tokenizer.add_tokens(self.additional_special_tokens)
         self.cls_token = cls_token
         self.mlm_token = mlm_token

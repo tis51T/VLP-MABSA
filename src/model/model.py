@@ -1,7 +1,9 @@
 # Based on transformers.modeling_bart
 
 from typing import Optional, Tuple
-from fastNLP.modules import Seq2SeqEncoder, Seq2SeqDecoder, State
+from fastNLP.modules.torch.encoder import Seq2SeqEncoder
+from fastNLP.modules.torch.decoder import Seq2SeqDecoder
+from fastNLP.modules.torch import State
 import torch
 import torch.nn.functional as F
 from torch import nn
