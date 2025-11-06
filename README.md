@@ -1,25 +1,11 @@
-# Vision-Language Pre-Training for Multimodal Aspect-Based Sentiment Analysis(VLP-MABSA)
-Codes and datasets for our ACL'2022 paper:[Vision-Language Pre-Training for Multimodal Aspect-Based Sentiment Analysis](https://aclanthology.org/2022.acl-long.152/)
+# About Repo
+VLP-MABSA model is pre-trained on the MVSA-Multi dataset (a multimodal Twitter dataset for coarse-grained sentiment analysis) and then fine-tuned and evaluated (i.e., benchmarked) on two downstream Twitter datasets.
 
-Author
+# Data and Pre-train model
+There are two version data: [Raw](https://drive.google.com/drive/folders/1d9XN5KjJH1oQJs0yun1SPHpfjfxsm15i) and [Process](https://drive.google.com/drive/folders/1rm0FtHOTMUfZfRjWIE9Ukn_1D5MDXQy3).
 
-Yan Ling
-
-ylin@njust.edu.cn
-
---------------update--------------
-
-2023.04.04 Add full text data of MVSA named **data_new.rar** to [Google Drive](https://drive.google.com/drive/folders/1d9XN5KjJH1oQJs0yun1SPHpfjfxsm15i?usp=share_link) and fix some errors of our code.
-
-2023.03.29 Add full image features and pretraining-labels to [Google Drive](https://drive.google.com/drive/folders/1d9XN5KjJH1oQJs0yun1SPHpfjfxsm15i?usp=share_link).
-
-2023.03.15 Add labels files of pre-training tasks and provide 3 samples of MVSA dataset after processing by the following steps in [Google Drive](https://drive.google.com/drive/folders/1d9XN5KjJH1oQJs0yun1SPHpfjfxsm15i?usp=share_link).
-
-2022.12.2 Add training files of subtasks.
-
-## Data Processing
-The pre-training dataset we use is MVSA-Multi. You can get from this [git](https://github.com/xunan0812/MultiSentiNet). At first, you need to use the judgement rules provided by the git to remove the samples with inconsistent labels.
-### Text Processing
+To process raw data, following below instruction:
+## Text Processing
 For texts in MVSA-Multi dataset, we first use NLTK to perform the tokenization.
 - How to obtain aspects
 
@@ -43,12 +29,12 @@ Using the text above as an example, the word "nice" belongs to the lexicon. We s
 ```
 
 The dics of aspect spans and opinion spans are used for the AOE pre-training task.
-### Image Processing
-- How to obtain the features of images
+## Image Processing
+### How to obtain the features of images
 
 For images in MVSA-Multi dataset, we perform [Faster-RCNN](https://github.com/jiasenlu/bottom-up-attention) to extract the region feature(only retain 36 regions with highest Confidence) as the input feature and the dimension of each region feature is 2048. For the details of how to perform Faster-RCNN, you can refer to the [Faster-RCNN](https://github.com/jiasenlu/bottom-up-attention).
-- How to obtain the ANP of each image
 
+### How to obtain the ANP of each image
 We employ [ANPs extractor](https://github.com/stephen-pilli/DeepSentiBank) to predict the ANPs distribution of each image.
 To run the code, you need to provide the list of image paths like
 ```
@@ -75,7 +61,8 @@ The result of [ANPs extractor](https://github.com/stephen-pilli/DeepSentiBank) i
 }
 ```
 The ANP with the highest probability is chosen as the output text of the AOG pre-training task.
-### Sentiment Processing
+
+## Sentiment Processing
 As introduced in the [git](https://github.com/xunan0812/MultiSentiNet), there are many tweets, in which the labels of text and image are inconsistent. Firstly, you need to adopt the judgement rule defined by the author to remove the incosistent data.
 Then we save the sentiment labels with the following format
 ```
@@ -83,14 +70,13 @@ Then we save the sentiment labels with the following format
 {"13357": 2, "13356": 0,...} # 0,1,2 denote negtive, neutral and positive, respectively
 ```
 For more details, we provide the description of our pre-training data files in **src/data/jsons/MVSA_descriptions.txt** which explains the files defined in **src/data/jsons/MVSA.json**.
-## Data Download
-Because the pre-training dataset after processing is very large, we only provide the downstream datasets. You can download the downstream datasets and our pre-training model via [Baidu Netdist](https://pan.baidu.com/s/11INRcFpoBR-6iggukx1VtA) with code:d0tn or [Google Drive](https://drive.google.com/drive/folders/1rm0FtHOTMUfZfRjWIE9Ukn_1D5MDXQy3?usp=sharing)
-## Pre-Training
+
+# Pre-Training
 If you have done all the processing above, you can perform the pre-training by running the code as follows.
 ```
 sh MVSA_pretrain.sh
 ```
-## Downstream Task Training
+# Downstream Task Training
 To Train the downstream JMASA task on two twitter datasets, you can just run the following code. Note that you need to change all the file path in file **src\data\jsons\twitter15_info.json** and **src\data\jsons\twitter17_info.json** to your own path.
 ```
 sh 15_pretrain_full.sh
@@ -104,5 +90,3 @@ The following is the description of some parameters of the above shell
 --checkpoint        path of the pre-training model
 ```
 We also provide our training logs on two datasets in folder **./log**.  
-## Acknowledgements
-- Some codes are based on the codes of [BARTABSA](https://github.com/yhcc/BARTABSA) and [KM-BART](https://github.com/FomalhautB/KM-BART), many thanks!
