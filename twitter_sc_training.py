@@ -101,6 +101,7 @@ def main(rank, args):
     eos_token_id = 1
 
     if args.checkpoint:
+        print('load from checkpoint!!!!!!!!')
         pretrain_model = MultiModalBartModelForPretrain.from_pretrained(
             args.checkpoint,
             config=bart_config,
@@ -130,6 +131,7 @@ def main(rank, args):
                                        pad_token_id=eos_token_id,
                                        restricter=None)
     else:
+        print("================ No Pretrain ====================")
         seq2seq_model = MultiModalBartModel_AESC(bart_config, args,
                                                  args.bart_model, tokenizer,
                                                  label_ids)

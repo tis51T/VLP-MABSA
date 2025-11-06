@@ -1,0 +1,54 @@
+2025-11-06 23:21:10,778 INFO ============ Initialed with 1 GPU(s) =============
+2025-11-06 23:21:10,778 INFO dataset: [['twitter15', './src/data/jsons/twitter15_info.json']]
+2025-11-06 23:21:10,778 INFO checkpoint_dir: ./
+2025-11-06 23:21:10,778 INFO bart_model: facebook/bart-base
+2025-11-06 23:21:10,778 INFO log_dir: 15ae
+2025-11-06 23:21:10,778 INFO model_config: ./config/pretrain_base.json
+2025-11-06 23:21:10,778 INFO text_only: 0
+2025-11-06 23:21:10,778 INFO checkpoint: None
+2025-11-06 23:21:10,778 INFO lr_decay_every: 4
+2025-11-06 23:21:10,778 INFO lr_decay_ratio: 0.8
+2025-11-06 23:21:10,793 INFO epochs: 35
+2025-11-06 23:21:10,793 INFO eval_every: 1
+2025-11-06 23:21:10,793 INFO lr: 4e-05
+2025-11-06 23:21:10,793 INFO num_beams: 4
+2025-11-06 23:21:10,793 INFO continue_training: False
+2025-11-06 23:21:10,793 INFO warmup: 0.1
+2025-11-06 23:21:10,793 INFO dropout: None
+2025-11-06 23:21:10,793 INFO classif_dropout: None
+2025-11-06 23:21:10,793 INFO attention_dropout: None
+2025-11-06 23:21:10,793 INFO activation_dropout: None
+2025-11-06 23:21:10,793 INFO grad_clip: 5.0
+2025-11-06 23:21:10,793 INFO gpu_num: 1
+2025-11-06 23:21:10,793 INFO cpu: False
+2025-11-06 23:21:10,793 INFO amp: False
+2025-11-06 23:21:10,793 INFO master_port: 12355
+2025-11-06 23:21:10,793 INFO batch_size: 16
+2025-11-06 23:21:10,793 INFO seed: 77
+2025-11-06 23:21:10,793 INFO num_workers: 0
+2025-11-06 23:21:10,793 INFO max_len: 10
+2025-11-06 23:21:10,793 INFO max_len_a: 0.6
+2025-11-06 23:21:10,793 INFO ANP_loss_type: KL
+2025-11-06 23:21:10,793 INFO bart_init: 1
+2025-11-06 23:21:10,793 INFO sample_num: 500
+2025-11-06 23:21:10,793 INFO is_sample: 0
+2025-11-06 23:21:10,793 INFO start_idx: 0
+2025-11-06 23:21:10,793 INFO check_info: 
+2025-11-06 23:21:10,793 INFO is_check: 0
+2025-11-06 23:21:10,793 INFO task: twitter_ae
+2025-11-06 23:21:10,793 INFO Loading model...
+2025-11-06 23:21:10,793 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2025-11-06 23:21:11,465 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/tokenizer_config.json HTTP/1.1" 404 0
+2025-11-06 23:21:11,780 DEBUG https://huggingface.co:443 "GET /api/models/facebook/bart-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64
+2025-11-06 23:21:12,075 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/vocab.json HTTP/1.1" 307 0
+2025-11-06 23:21:12,160 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/vocab.json HTTP/1.1" 200 0
+2025-11-06 23:21:12,539 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/config.json HTTP/1.1" 307 0
+2025-11-06 23:21:12,630 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/config.json HTTP/1.1" 200 0
+2025-11-06 23:21:12,927 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/config.json HTTP/1.1" 307 0
+2025-11-06 23:21:13,015 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/config.json HTTP/1.1" 200 0
+2025-11-06 23:21:15,906 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/tokenizer_config.json HTTP/1.1" 404 0
+2025-11-06 23:21:16,236 DEBUG https://huggingface.co:443 "GET /api/models/facebook/bart-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64
+2025-11-06 23:21:16,532 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/vocab.json HTTP/1.1" 307 0
+2025-11-06 23:21:16,609 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/vocab.json HTTP/1.1" 200 0
+2025-11-06 23:21:16,984 INFO Loading data...
+2025-11-06 23:21:17,000 INFO ==================== Epoch 1 =====================
