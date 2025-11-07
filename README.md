@@ -1,6 +1,24 @@
 # About Repo
 VLP-MABSA model is pre-trained on the MVSA-Multi dataset (a multimodal Twitter dataset for coarse-grained sentiment analysis) and then fine-tuned and evaluated (i.e., benchmarked) on two downstream Twitter datasets.
 
+The directory will look like:
+```
+VLP-MABSA/
+  |-- checkpoint/                  # Pretrained model from MVSA dataset
+  |-- config/
+  |-- log/                         # Logging
+  |-- scripts/                     # Contain .bat/.sh files for executing
+  |-- src/
+  |-- data/                        # Raw data + process method
+  |-- pretrain.py                  # pretrain a model from MSVA dataset
+  |-- MAESC_training.py            # pretrain/finetune model for JMASA task
+  |-- twitter_ae_training.py       # pretrain/finetune model for MATE task
+  |-- twitter_ae_training.py       # pretrain/finetune model for MASC task
+```
+
+Folders `checkpoint` and `data` can be found at here.
+
+
 # Data and Pre-train model
 There are two version data: [Raw](https://drive.google.com/drive/folders/1d9XN5KjJH1oQJs0yun1SPHpfjfxsm15i) and [Process](https://drive.google.com/drive/folders/1rm0FtHOTMUfZfRjWIE9Ukn_1D5MDXQy3).
 
