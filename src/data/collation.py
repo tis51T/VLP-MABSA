@@ -180,6 +180,7 @@ class Collator:
 
         output['image_id'] = [x['image_id'] for x in batch]
         output['gt'] = [x['gt'] for x in batch]
+        output['texts'] = target  # Add texts for similarity weighting
         return output
 
     def _mask_tokens(self, inputs, input_mask):

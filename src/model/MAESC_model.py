@@ -1,5 +1,5 @@
 from typing import Optional, Tuple
-from fastNLP.modules.torch import State
+from fastNLP.modules import State
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -101,12 +101,14 @@ class MultiModalBartModel_AESC(PretrainedBartModel):
                       input_ids,
                       image_features,
                       attention_mask=None,
-                      first=None):
+                      first=None,
+                      texts=None):
         dict = self.encoder(input_ids=input_ids,
                             image_features=image_features,
                             attention_mask=attention_mask,
                             output_hidden_states=True,
-                            return_dict=True)
+                            return_dict=True,
+                            texts=texts)
         encoder_outputs = dict.last_hidden_state
         hidden_states = dict.hidden_states
         encoder_mask = attention_mask
@@ -131,9 +133,10 @@ class MultiModalBartModel_AESC(PretrainedBartModel):
             use_cache=None,
             output_attentions=None,
             output_hidden_states=None,
+            texts=None,
     ):
 
-        state = self.prepare_state(input_ids, image_features, attention_mask)
+        state = self.prepare_state(input_ids, image_features, attention_mask, texts=texts)
         spans, span_mask = [
             aesc_infos['labels'].to(input_ids.device),
             aesc_infos['masks'].to(input_ids.device)

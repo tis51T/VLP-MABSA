@@ -3,8 +3,8 @@ r"""undocumented"""
 import torch
 from torch import nn
 
-from fastNLP.models.torch.seq2seq_model import Seq2SeqModel
-from fastNLP.modules.torch.decoder import Seq2SeqDecoder
+from fastNLP.models.seq2seq_model import Seq2SeqModel
+from fastNLP.modules.decoder import Seq2SeqDecoder
 import torch.nn.functional as F
 from functools import partial
 
@@ -82,7 +82,8 @@ class SequenceGeneratorModel(nn.Module):
                 image_features,
                 attention_mask=None,
                 aesc_infos=None,
-                first=None):
+                first=None,
+                texts=None):
         """
         透传调用seq2seq_model的forward
 
@@ -95,7 +96,8 @@ class SequenceGeneratorModel(nn.Module):
         return self.seq2seq_model(input_ids=input_ids,
                                   image_features=image_features,
                                   attention_mask=attention_mask,
-                                  aesc_infos=aesc_infos)
+                                  aesc_infos=aesc_infos,
+                                  texts=texts)
 
     def predict(self,
                 input_ids,

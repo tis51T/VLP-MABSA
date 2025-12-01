@@ -18,6 +18,7 @@ from src.model.modeling_bart import (PretrainedBartModel, BartDecoder,
                                      _prepare_bart_decoder_inputs)
 from src.model.config import MultiModalBartConfig
 from transformers.modeling_outputs import BaseModelOutput
+from similarity_weighting import SimilarityWeighting
 
 
 class ImageEmbedding(nn.Module):
@@ -78,6 +79,26 @@ class MultiModalBartEncoder(nn.Module):
         self.layernorm_embedding = encoder.layernorm_embedding
         # mbart has one extra layer_norm
         self.layer_norm = encoder.layer_norm
+        
+        # Add similarity weighting
+        self.similarity_weighting = SimilarityWeighting(
+            weight=0.5,
+            adaptive_weighting=True,
+            use_attention=True,
+            cache_size=1000,
+            temperature=0.07,
+            multi_scale_crops=False  # We don't have full images, only regions
+        )
+        
+        # Add similarity weighting
+        self.similarity_weighting = SimilarityWeighting(
+            weight=0.5,
+            adaptive_weighting=True,
+            use_attention=True,
+            cache_size=1000,
+            temperature=0.07,
+            multi_scale_crops=False  # We don't have full images, only regions
+        )
 
     def _embed_multi_modal(self, input_ids, image_features):
         """embed textual and visual inputs and combine them into one embedding"""
@@ -102,7 +123,8 @@ class MultiModalBartEncoder(nn.Module):
                 attention_mask=None,
                 output_attentions=False,
                 output_hidden_states=False,
-                return_dict=False):
+                return_dict=False,
+                texts=None):
         """
 
         :param input_ids: LongTensor, tokens in the source language of shape (batch, src_len)
@@ -125,6 +147,37 @@ class MultiModalBartEncoder(nn.Module):
 
         inputs_embeds = self._embed_multi_modal(
             input_ids, image_features) * self.embed_scale
+        
+        # Apply similarity weighting if texts are provided
+        if texts is not None and len(image_features) > 0:
+            try:
+                # Extract image embeddings for similarity weighting
+                batch_size = input_ids.shape[0]
+                img_mask = (input_ids == self.img_feat_id)
+                
+                # Apply similarity weighting to image regions in embedding space
+                for batch_idx in range(batch_size):
+                    if batch_idx < len(image_features) and len(image_features[batch_idx]) > 0:
+                        # Get image positions for this batch item
+                        img_positions = img_mask[batch_idx].nonzero(as_tuple=True)[0]
+                        if len(img_positions) > 0:
+                            # Extract image embeddings
+                            img_embeds = inputs_embeds[batch_idx, img_positions]  # [num_regions, embed_dim]
+                            
+                            # Apply similarity weighting (using region features as proxy for images)
+                            weighted_embeds = self.similarity_weighting(
+                                img_embeds.unsqueeze(0),  # [1, num_regions, embed_dim] 
+                                image_features[batch_idx:batch_idx+1],  # List of one tensor
+                                texts[batch_idx:batch_idx+1] if isinstance(texts, list) else [texts[batch_idx]]
+                            )
+                            
+                            # Update the embeddings
+                            inputs_embeds[batch_idx, img_positions] = weighted_embeds.squeeze(0)
+            except Exception as e:
+                # If similarity weighting fails, continue without it
+                print(f"Similarity weighting failed: {e}")
+                pass
+        
         embed_pos = self.embed_positions(input_ids)
         x = inputs_embeds + embed_pos
         x = self.layernorm_embedding(x)
