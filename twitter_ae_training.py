@@ -54,6 +54,8 @@ def main(rank, args):
         os.makedirs(log_dir)
         tb_writer = SummaryWriter(log_dir=log_dir)
 
+    
+
     logger = Logger(log_dir=os.path.join(log_dir, 'log.txt'),
                     enabled=(rank == 0))
     # prf_logger = Logger(log_dir=os.path.join(log_dir, 'prf_log.txt'),
@@ -249,8 +251,22 @@ def main(rank, args):
             if args.is_check == 1 and save_flag:
                 current_checkpoint_path = os.path.join(checkpoint_path,
                                                        args.check_info)
-                model.seq2seq_model.save_pretrained(current_checkpoint_path)
+                try:
+                    model.seq2seq_model.save_pretrained(current_checkpoint_path)
+                except RuntimeError as e:
+                    logger.info(f'save_pretrained failed: {e}. Trying fallback save...')
+                    try:
+                        model.seq2seq_model.save_pretrained(current_checkpoint_path, safe_serialization=False)
+                    except TypeError:
+                        os.makedirs(current_checkpoint_path, exist_ok=True)
+                        torch.save(model.seq2seq_model.state_dict(),
+                                   os.path.join(current_checkpoint_path, 'pytorch_model.bin'))
+                        if hasattr(model.seq2seq_model, 'config') and model.seq2seq_model.config is not None:
+                            with open(os.path.join(current_checkpoint_path, 'config.json'), 'w') as fh:
+                                fh.write(model.seq2seq_model.config.to_json_string())
+                        logger.info('Manual checkpoint write complete.')
                 print('save model!!!!!!!!!!!')
+            
         epoch += 1
     logger.info("Training complete in: " + str(datetime.now() - start),
                 pad=True)

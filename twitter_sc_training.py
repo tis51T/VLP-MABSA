@@ -54,6 +54,8 @@ def main(rank, args):
         os.makedirs(log_dir)
         tb_writer = SummaryWriter(log_dir=log_dir)
 
+    
+
     logger = Logger(log_dir=os.path.join(log_dir, 'log.txt'),
                     enabled=(rank == 0))
 
@@ -238,8 +240,6 @@ def main(rank, args):
                 res_test['sc_pre'], res_test['sc_rec'], res_test['sc_f']))
             logger.info('TEST  sc_acc:{}'.format(res_test['sc_acc']))
 
-            # logger.info('DEV  ae_p:{} ae_r:{} ae_f:{}'.format(
-            #     res_dev['ae_pre'], res_dev['ae_rec'], res_dev['ae_f']))
             save_flag = False
             if best_dev_res is None:
                 best_dev_res = res_dev
@@ -261,8 +261,22 @@ def main(rank, args):
             if args.is_check == 1 and save_flag:
                 current_checkpoint_path = os.path.join(checkpoint_path,
                                                        args.check_info)
-                model.seq2seq_model.save_pretrained(current_checkpoint_path)
-                print('save model!!!!!!!!!!!')
+                try:
+                    model.seq2seq_model.save_pretrained(current_checkpoint_path)
+                except RuntimeError as e:
+                    logger.info(f'Save_pretrained to path failed: {e}. Trying fallback save...')
+                    try:
+                        model.seq2seq_model.save_pretrained(current_checkpoint_path, safe_serialization=False)
+                    except TypeError:
+                        os.makedirs(current_checkpoint_path, exist_ok=True)
+                        torch.save(model.seq2seq_model.state_dict(),
+                                   os.path.join(current_checkpoint_path, 'pytorch_model.bin'))
+                        if hasattr(model.seq2seq_model, 'config') and model.seq2seq_model.config is not None:
+                            with open(os.path.join(current_checkpoint_path, 'config.json'), 'w') as fh:
+                                fh.write(model.seq2seq_model.config.to_json_string())
+                        logger.info('Manual checkpoint write complete.')
+                logger.info(f'Save_pretrained success to path {current_checkpoint_path}!')
+            
         epoch += 1
     logger.info("Training complete in: " + str(datetime.now() - start),
                 pad=True)

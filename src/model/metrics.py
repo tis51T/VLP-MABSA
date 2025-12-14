@@ -8,7 +8,8 @@ class AESCSpanMetric(object):
                  eos_token_id,
                  num_labels,
                  conflict_id,
-                 opinion_first=False):
+                 opinion_first=False,
+                 id2label=None):
         super(AESCSpanMetric, self).__init__()
         self.eos_token_id = eos_token_id
         self.word_start_index = num_labels + 2
@@ -29,6 +30,12 @@ class AESCSpanMetric(object):
         self.total = 0
         self.invalid = 0
         self.conflict_id = conflict_id
+        # optional mapping from small label ids (e.g. 2,3,4..) to human names like 'POS'
+        self.id2label = id2label
+        # IoU accumulators: switched to per-sample averaging
+        # For each sample we compute the mean IoU across its predictions (or 0 if no predictions)
+        self.sample_iou_sum = 0.0
+        self.sample_iou_count = 0
         # assert opinion_first is False, "Current metric only supports aspect first"
 
     def evaluate(self, aesc_target_span, pred, tgt_tokens):
@@ -81,6 +88,9 @@ class AESCSpanMetric(object):
 
             aesc_target_counter = Counter()
             aesc_pred_counter = Counter()
+            # collect raw lists for debugging (triples)
+            target_list = []
+            pred_list = []
             ae_target_counter = Counter()
             ae_pred_counter = Counter()
             conflicts = set()
@@ -94,6 +104,7 @@ class AESCSpanMetric(object):
                 ae_target_counter[(t[0], t[1])] = 1
                 if t[2] != self.conflict_id:
                     aesc_target_counter[(t[0], t[1])] = t[2]
+                    target_list.append((t[0], t[1], t[2]))
                 else:
                     conflicts.add((t[0], t[1]))
 
@@ -102,6 +113,38 @@ class AESCSpanMetric(object):
                 if (p[0], p[1]) not in conflicts and p[-1] not in (
                         0, 1, self.conflict_id):
                     aesc_pred_counter[(p[0], p[1])] = p[-1]
+                    pred_list.append((p[0], p[1], p[-1]))
+
+            # compute Intersection over Union (IoU) for predicted spans vs targets
+            # For each prediction, compute IoU with each target span, then average over targets.
+            # Finally average these per-prediction IoUs across all predictions.
+            pred_iou_list = []
+            if len(pred_list) > 0:
+                if len(target_list) > 0:
+                    for (ps, pe, _pl) in pred_list:
+                        ious = []
+                        for (ts, te, _tl) in target_list:
+                            inter = max(0, min(pe, te) - max(ps, ts) + 1)
+                            union = (pe - ps + 1) + (te - ts + 1) - inter
+                            iou_val = inter / union if union > 0 else 0.0
+                            ious.append(iou_val)
+                        avg_iou_pred = sum(ious) / len(ious)
+                        pred_iou_list.append(avg_iou_pred)
+                else:
+                    # no targets: IoU for any prediction is 0
+                    for (_ps, _pe, _pl) in pred_list:
+                        pred_iou_list.append(0.0)
+
+            # aggregate IoU per-sample: average pred_iou_list (or 0 if empty)
+            if len(pred_iou_list) > 0:
+                sample_iou = sum(pred_iou_list) / len(pred_iou_list)
+            else:
+                sample_iou = 0.0
+            # accumulate per-sample IoU
+            self.sample_iou_sum += sample_iou
+            self.sample_iou_count += 1
+            # (debug sample collection removed)
+
 
             # 这里相同的pair会被计算多次
             tp, fn, fp = _compute_tp_fn_fp(
@@ -177,6 +220,15 @@ class AESCSpanMetric(object):
         res['sc_all_num'] = self.sc_all_num
         res['em'] = round(self.em / self.total, 4)
         res['invalid'] = round(self.invalid / self.total, 4)
+        # expose per-class counts so callers can build detailed reports (class names live in the tokenizer)
+        res['sc_tp_counts'] = dict(self.sc_tp)
+        res['sc_fp_counts'] = dict(self.sc_fp)
+        res['sc_fn_counts'] = dict(self.sc_fn)
+        # overall IoU averaged per-sample (0..1)
+        if self.sample_iou_count > 0:
+            res['iou'] = round(self.sample_iou_sum / (self.sample_iou_count + 1e-12), 4)
+        else:
+            res['iou'] = 0.0
         if reset:
             self.aesc_fp = 0
             self.aesc_tp = 0
@@ -189,6 +241,13 @@ class AESCSpanMetric(object):
             self.sc_fp = Counter()
             self.sc_tp = Counter()
             self.sc_fn = Counter()
+            self.sample_iou_sum = 0.0
+            self.sample_iou_count = 0
+            # also reset evaluation counters that are aggregated across batches
+            # (em, total and invalid) so each eval() call reports fresh metrics
+            self.em = 0
+            self.total = 0
+            self.invalid = 0
 
         return res
 
@@ -326,7 +385,10 @@ class OESpanMetric(object):
             self.oe_fp = 0
             self.oe_tp = 0
             self.oe_fn = 0
-
+            # reset aggregated counters used in reporting
+            self.em = 0
+            self.total = 0
+            self.invalid = 0
         return res
 
 

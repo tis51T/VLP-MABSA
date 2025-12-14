@@ -1,0 +1,145 @@
+2025-12-13 20:02:23,149 INFO Made checkpoint directory: "./hotel_best_model_aesc\2025-12-13-20-02-23"
+2025-12-13 20:02:23,149 INFO ============ Initialed with 1 GPU(s) =============
+2025-12-13 20:02:23,149 INFO dataset: [['hotel_review', './src/data/jsons/hotel_info.json']]
+2025-12-13 20:02:23,149 INFO checkpoint_dir: ./hotel_best_model_aesc
+2025-12-13 20:02:23,149 INFO bart_model: facebook/bart-base
+2025-12-13 20:02:23,149 INFO log_dir: hotel_aesc
+2025-12-13 20:02:23,149 INFO model_config: config/pretrain_base.json
+2025-12-13 20:02:23,149 INFO text_only: False
+2025-12-13 20:02:23,149 INFO checkpoint: ./checkpoint/pytorch_model.bin
+2025-12-13 20:02:23,149 INFO lr_decay_every: 4
+2025-12-13 20:02:23,149 INFO lr_decay_ratio: 0.8
+2025-12-13 20:02:23,149 INFO epochs: 20
+2025-12-13 20:02:23,149 INFO eval_every: 1
+2025-12-13 20:02:23,149 INFO lr: 4e-05
+2025-12-13 20:02:23,149 INFO num_beams: 4
+2025-12-13 20:02:23,149 INFO continue_training: False
+2025-12-13 20:02:23,149 INFO warmup: 0.1
+2025-12-13 20:02:23,149 INFO dropout: None
+2025-12-13 20:02:23,149 INFO classif_dropout: None
+2025-12-13 20:02:23,149 INFO attention_dropout: None
+2025-12-13 20:02:23,149 INFO activation_dropout: None
+2025-12-13 20:02:23,149 INFO grad_clip: 5.0
+2025-12-13 20:02:23,149 INFO gpu_num: 1
+2025-12-13 20:02:23,149 INFO cpu: False
+2025-12-13 20:02:23,149 INFO amp: False
+2025-12-13 20:02:23,149 INFO master_port: 12355
+2025-12-13 20:02:23,149 INFO batch_size: 8
+2025-12-13 20:02:23,149 INFO seed: 2026
+2025-12-13 20:02:23,149 INFO num_workers: 0
+2025-12-13 20:02:23,149 INFO max_len: 10
+2025-12-13 20:02:23,149 INFO max_len_a: 0.6
+2025-12-13 20:02:23,149 INFO bart_init: 1
+2025-12-13 20:02:23,149 INFO check_info: 
+2025-12-13 20:02:23,149 INFO is_check: 1
+2025-12-13 20:02:23,149 INFO task: 
+2025-12-13 20:02:23,149 INFO Loading model...
+2025-12-13 20:02:23,149 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2025-12-13 20:02:24,922 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/tokenizer_config.json HTTP/1.1" 404 0
+2025-12-13 20:02:25,256 DEBUG https://huggingface.co:443 "GET /api/models/facebook/bart-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64
+2025-12-13 20:02:25,567 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/vocab.json HTTP/1.1" 307 0
+2025-12-13 20:02:25,798 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/vocab.json HTTP/1.1" 200 0
+2025-12-13 20:02:25,944 INFO loading weights file ./checkpoint/pytorch_model.bin
+2025-12-13 20:02:26,462 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/config.json HTTP/1.1" 307 0
+2025-12-13 20:02:26,674 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/config.json HTTP/1.1" 200 0
+2025-12-13 20:02:27,012 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/config.json HTTP/1.1" 307 0
+2025-12-13 20:02:27,223 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/config.json HTTP/1.1" 200 0
+2025-12-13 20:02:30,597 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/tokenizer_config.json HTTP/1.1" 404 0
+2025-12-13 20:02:30,924 DEBUG https://huggingface.co:443 "GET /api/models/facebook/bart-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64
+2025-12-13 20:02:31,229 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/vocab.json HTTP/1.1" 307 0
+2025-12-13 20:02:31,444 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/vocab.json HTTP/1.1" 200 0
+2025-12-13 20:02:32,731 WARNING Some weights of the model checkpoint at ./checkpoint/pytorch_model.bin were not used when initializing MultiModalBartModelForPretrain: ['anp_decoder.decoder.embed_tokens.weight', 'anp_decoder.decoder.embed_positions.weight', 'anp_decoder.decoder.layers.0.self_attn.k_proj.weight', 'anp_decoder.decoder.layers.0.self_attn.k_proj.bias', 'anp_decoder.decoder.layers.0.self_attn.v_proj.weight', 'anp_decoder.decoder.layers.0.self_attn.v_proj.bias', 'anp_decoder.decoder.layers.0.self_attn.q_proj.weight', 'anp_decoder.decoder.layers.0.self_attn.q_proj.bias', 'anp_decoder.decoder.layers.0.self_attn.out_proj.weight', 'anp_decoder.decoder.layers.0.self_attn.out_proj.bias', 'anp_decoder.decoder.layers.0.self_attn_layer_norm.weight', 'anp_decoder.decoder.layers.0.self_attn_layer_norm.bias', 'anp_decoder.decoder.layers.0.encoder_attn.k_proj.weight', 'anp_decoder.decoder.layers.0.encoder_attn.k_proj.bias', 'anp_decoder.decoder.layers.0.encoder_attn.v_proj.weight', 'anp_decoder.decoder.layers.0.encoder_attn.v_proj.bias', 'anp_decoder.decoder.layers.0.encoder_attn.q_proj.weight', 'anp_decoder.decoder.layers.0.encoder_attn.q_proj.bias', 'anp_decoder.decoder.layers.0.encoder_attn.out_proj.weight', 'anp_decoder.decoder.layers.0.encoder_attn.out_proj.bias', 'anp_decoder.decoder.layers.0.encoder_attn_layer_norm.weight', 'anp_decoder.decoder.layers.0.encoder_attn_layer_norm.bias', 'anp_decoder.decoder.layers.0.fc1.weight', 'anp_decoder.decoder.layers.0.fc1.bias', 'anp_decoder.decoder.layers.0.fc2.weight', 'anp_decoder.decoder.layers.0.fc2.bias', 'anp_decoder.decoder.layers.0.final_layer_norm.weight', 'anp_decoder.decoder.layers.0.final_layer_norm.bias', 'anp_decoder.decoder.layers.1.self_attn.k_proj.weight', 'anp_decoder.decoder.layers.1.self_attn.k_proj.bias', 'anp_decoder.decoder.layers.1.self_attn.v_proj.weight', 'anp_decoder.decoder.layers.1.self_attn.v_proj.bias', 'anp_decoder.decoder.layers.1.self_attn.q_proj.weight', 'anp_decoder.decoder.layers.1.self_attn.q_proj.bias', 'anp_decoder.decoder.layers.1.self_attn.out_proj.weight', 'anp_decoder.decoder.layers.1.self_attn.out_proj.bias', 'anp_decoder.decoder.layers.1.self_attn_layer_norm.weight', 'anp_decoder.decoder.layers.1.self_attn_layer_norm.bias', 'anp_decoder.decoder.layers.1.encoder_attn.k_proj.weight', 'anp_decoder.decoder.layers.1.encoder_attn.k_proj.bias', 'anp_decoder.decoder.layers.1.encoder_attn.v_proj.weight', 'anp_decoder.decoder.layers.1.encoder_attn.v_proj.bias', 'anp_decoder.decoder.layers.1.encoder_attn.q_proj.weight', 'anp_decoder.decoder.layers.1.encoder_attn.q_proj.bias', 'anp_decoder.decoder.layers.1.encoder_attn.out_proj.weight', 'anp_decoder.decoder.layers.1.encoder_attn.out_proj.bias', 'anp_decoder.decoder.layers.1.encoder_attn_layer_norm.weight', 'anp_decoder.decoder.layers.1.encoder_attn_layer_norm.bias', 'anp_decoder.decoder.layers.1.fc1.weight', 'anp_decoder.decoder.layers.1.fc1.bias', 'anp_decoder.decoder.layers.1.fc2.weight', 'anp_decoder.decoder.layers.1.fc2.bias', 'anp_decoder.decoder.layers.1.final_layer_norm.weight', 'anp_decoder.decoder.layers.1.final_layer_norm.bias', 'anp_decoder.decoder.layers.2.self_attn.k_proj.weight', 'anp_decoder.decoder.layers.2.self_attn.k_proj.bias', 'anp_decoder.decoder.layers.2.self_attn.v_proj.weight', 'anp_decoder.decoder.layers.2.self_attn.v_proj.bias', 'anp_decoder.decoder.layers.2.self_attn.q_proj.weight', 'anp_decoder.decoder.layers.2.self_attn.q_proj.bias', 'anp_decoder.decoder.layers.2.self_attn.out_proj.weight', 'anp_decoder.decoder.layers.2.self_attn.out_proj.bias', 'anp_decoder.decoder.layers.2.self_attn_layer_norm.weight', 'anp_decoder.decoder.layers.2.self_attn_layer_norm.bias', 'anp_decoder.decoder.layers.2.encoder_attn.k_proj.weight', 'anp_decoder.decoder.layers.2.encoder_attn.k_proj.bias', 'anp_decoder.decoder.layers.2.encoder_attn.v_proj.weight', 'anp_decoder.decoder.layers.2.encoder_attn.v_proj.bias', 'anp_decoder.decoder.layers.2.encoder_attn.q_proj.weight', 'anp_decoder.decoder.layers.2.encoder_attn.q_proj.bias', 'anp_decoder.decoder.layers.2.encoder_attn.out_proj.weight', 'anp_decoder.decoder.layers.2.encoder_attn.out_proj.bias', 'anp_decoder.decoder.layers.2.encoder_attn_layer_norm.weight', 'anp_decoder.decoder.layers.2.encoder_attn_layer_norm.bias', 'anp_decoder.decoder.layers.2.fc1.weight', 'anp_decoder.decoder.layers.2.fc1.bias', 'anp_decoder.decoder.layers.2.fc2.weight', 'anp_decoder.decoder.layers.2.fc2.bias', 'anp_decoder.decoder.layers.2.final_layer_norm.weight', 'anp_decoder.decoder.layers.2.final_layer_norm.bias', 'anp_decoder.decoder.layers.3.self_attn.k_proj.weight', 'anp_decoder.decoder.layers.3.self_attn.k_proj.bias', 'anp_decoder.decoder.layers.3.self_attn.v_proj.weight', 'anp_decoder.decoder.layers.3.self_attn.v_proj.bias', 'anp_decoder.decoder.layers.3.self_attn.q_proj.weight', 'anp_decoder.decoder.layers.3.self_attn.q_proj.bias', 'anp_decoder.decoder.layers.3.self_attn.out_proj.weight', 'anp_decoder.decoder.layers.3.self_attn.out_proj.bias', 'anp_decoder.decoder.layers.3.self_attn_layer_norm.weight', 'anp_decoder.decoder.layers.3.self_attn_layer_norm.bias', 'anp_decoder.decoder.layers.3.encoder_attn.k_proj.weight', 'anp_decoder.decoder.layers.3.encoder_attn.k_proj.bias', 'anp_decoder.decoder.layers.3.encoder_attn.v_proj.weight', 'anp_decoder.decoder.layers.3.encoder_attn.v_proj.bias', 'anp_decoder.decoder.layers.3.encoder_attn.q_proj.weight', 'anp_decoder.decoder.layers.3.encoder_attn.q_proj.bias', 'anp_decoder.decoder.layers.3.encoder_attn.out_proj.weight', 'anp_decoder.decoder.layers.3.encoder_attn.out_proj.bias', 'anp_decoder.decoder.layers.3.encoder_attn_layer_norm.weight', 'anp_decoder.decoder.layers.3.encoder_attn_layer_norm.bias', 'anp_decoder.decoder.layers.3.fc1.weight', 'anp_decoder.decoder.layers.3.fc1.bias', 'anp_decoder.decoder.layers.3.fc2.weight', 'anp_decoder.decoder.layers.3.fc2.bias', 'anp_decoder.decoder.layers.3.final_layer_norm.weight', 'anp_decoder.decoder.layers.3.final_layer_norm.bias', 'anp_decoder.decoder.layers.4.self_attn.k_proj.weight', 'anp_decoder.decoder.layers.4.self_attn.k_proj.bias', 'anp_decoder.decoder.layers.4.self_attn.v_proj.weight', 'anp_decoder.decoder.layers.4.self_attn.v_proj.bias', 'anp_decoder.decoder.layers.4.self_attn.q_proj.weight', 'anp_decoder.decoder.layers.4.self_attn.q_proj.bias', 'anp_decoder.decoder.layers.4.self_attn.out_proj.weight', 'anp_decoder.decoder.layers.4.self_attn.out_proj.bias', 'anp_decoder.decoder.layers.4.self_attn_layer_norm.weight', 'anp_decoder.decoder.layers.4.self_attn_layer_norm.bias', 'anp_decoder.decoder.layers.4.encoder_attn.k_proj.weight', 'anp_decoder.decoder.layers.4.encoder_attn.k_proj.bias', 'anp_decoder.decoder.layers.4.encoder_attn.v_proj.weight', 'anp_decoder.decoder.layers.4.encoder_attn.v_proj.bias', 'anp_decoder.decoder.layers.4.encoder_attn.q_proj.weight', 'anp_decoder.decoder.layers.4.encoder_attn.q_proj.bias', 'anp_decoder.decoder.layers.4.encoder_attn.out_proj.weight', 'anp_decoder.decoder.layers.4.encoder_attn.out_proj.bias', 'anp_decoder.decoder.layers.4.encoder_attn_layer_norm.weight', 'anp_decoder.decoder.layers.4.encoder_attn_layer_norm.bias', 'anp_decoder.decoder.layers.4.fc1.weight', 'anp_decoder.decoder.layers.4.fc1.bias', 'anp_decoder.decoder.layers.4.fc2.weight', 'anp_decoder.decoder.layers.4.fc2.bias', 'anp_decoder.decoder.layers.4.final_layer_norm.weight', 'anp_decoder.decoder.layers.4.final_layer_norm.bias', 'anp_decoder.decoder.layers.5.self_attn.k_proj.weight', 'anp_decoder.decoder.layers.5.self_attn.k_proj.bias', 'anp_decoder.decoder.layers.5.self_attn.v_proj.weight', 'anp_decoder.decoder.layers.5.self_attn.v_proj.bias', 'anp_decoder.decoder.layers.5.self_attn.q_proj.weight', 'anp_decoder.decoder.layers.5.self_attn.q_proj.bias', 'anp_decoder.decoder.layers.5.self_attn.out_proj.weight', 'anp_decoder.decoder.layers.5.self_attn.out_proj.bias', 'anp_decoder.decoder.layers.5.self_attn_layer_norm.weight', 'anp_decoder.decoder.layers.5.self_attn_layer_norm.bias', 'anp_decoder.decoder.layers.5.encoder_attn.k_proj.weight', 'anp_decoder.decoder.layers.5.encoder_attn.k_proj.bias', 'anp_decoder.decoder.layers.5.encoder_attn.v_proj.weight', 'anp_decoder.decoder.layers.5.encoder_attn.v_proj.bias', 'anp_decoder.decoder.layers.5.encoder_attn.q_proj.weight', 'anp_decoder.decoder.layers.5.encoder_attn.q_proj.bias', 'anp_decoder.decoder.layers.5.encoder_attn.out_proj.weight', 'anp_decoder.decoder.layers.5.encoder_attn.out_proj.bias', 'anp_decoder.decoder.layers.5.encoder_attn_layer_norm.weight', 'anp_decoder.decoder.layers.5.encoder_attn_layer_norm.bias', 'anp_decoder.decoder.layers.5.fc1.weight', 'anp_decoder.decoder.layers.5.fc1.bias', 'anp_decoder.decoder.layers.5.fc2.weight', 'anp_decoder.decoder.layers.5.fc2.bias', 'anp_decoder.decoder.layers.5.final_layer_norm.weight', 'anp_decoder.decoder.layers.5.final_layer_norm.bias', 'anp_decoder.decoder.layernorm_embedding.weight', 'anp_decoder.decoder.layernorm_embedding.bias', 'anp_decoder.anp_head.dense.weight', 'anp_decoder.anp_head.dense.bias', 'anp_decoder.anp_head.out_proj.weight', 'anp_decoder.anp_head.out_proj.bias', 'encoder.layernorm_embedding.weight', 'encoder.layernorm_embedding.bias', 'mlm_decoder.decoder.layernorm_embedding.weight', 'mlm_decoder.decoder.layernorm_embedding.bias', 'mrm_decoder.decoder.layernorm_embedding.weight', 'mrm_decoder.decoder.layernorm_embedding.bias', 'span_decoder.decoder.layernorm_embedding.weight', 'span_decoder.decoder.layernorm_embedding.bias', 'anp_generate_decoder.decoder.layernorm_embedding.weight', 'anp_generate_decoder.decoder.layernorm_embedding.bias', 'senti_decoder.decoder.layernorm_embedding.weight', 'senti_decoder.decoder.layernorm_embedding.bias']
+- This IS expected if you are initializing MultiModalBartModelForPretrain from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPretraining model).
+- This IS NOT expected if you are initializing MultiModalBartModelForPretrain from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+2025-12-13 20:02:32,731 INFO All the weights of MultiModalBartModelForPretrain were initialized from the model checkpoint at ./checkpoint/pytorch_model.bin.
+If your task is similar to the task the model of the ckeckpoint was trained on, you can already use MultiModalBartModelForPretrain for predictions without further training.
+2025-12-13 20:02:33,074 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/config.json HTTP/1.1" 307 0
+2025-12-13 20:02:33,297 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/config.json HTTP/1.1" 200 0
+2025-12-13 20:02:33,611 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/config.json HTTP/1.1" 307 0
+2025-12-13 20:02:33,827 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/config.json HTTP/1.1" 200 0
+2025-12-13 20:02:35,550 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/tokenizer_config.json HTTP/1.1" 404 0
+2025-12-13 20:02:35,865 DEBUG https://huggingface.co:443 "GET /api/models/facebook/bart-base/tree/main/additional_chat_templates?recursive=False&expand=False HTTP/1.1" 404 64
+2025-12-13 20:02:36,200 DEBUG https://huggingface.co:443 "HEAD /facebook/bart-base/resolve/main/vocab.json HTTP/1.1" 307 0
+2025-12-13 20:02:36,414 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/facebook/bart-base/aadd2ab0ae0c8268c7c9693540e9904811f36177/vocab.json HTTP/1.1" 200 0
+2025-12-13 20:02:37,496 INFO Loading data...
+2025-12-13 20:02:37,794 INFO ==================== Epoch 1 =====================
+2025-12-13 20:08:49,046 INFO DEV  aesc_p:55.78 aesc_r:32.38 aesc_f:40.98
+2025-12-13 20:08:49,046 INFO TEST  aesc_p:53.23 aesc_r:31.92 aesc_f:39.91
+2025-12-13 20:08:49,046 INFO DEV  ae_p:71.16 ae_r:41.31 ae_f:52.27  sc_p:26.13 sc_r:33.33 sc_f:29.3 sc_acc:78.4
+2025-12-13 20:08:49,046 INFO TEST  ae_p:69.17 ae_r:41.48 ae_f:51.86  sc_p:25.65 sc_r:33.33 sc_f:28.99 sc_acc:76.96
+2025-12-13 20:08:49,046 INFO Sentiment classification report (DEV):
+2025-12-13 20:08:49,046 INFO class    precision   recall       f1  support
+2025-12-13 20:08:49,046 INFO POS         78.40   100.00    87.89      352
+2025-12-13 20:08:49,046 INFO NEU          0.00     0.00     0.00       30
+2025-12-13 20:08:49,046 INFO NEG          0.00     0.00     0.00       67
+2025-12-13 20:08:49,046 INFO Sentiment classification report (TEST):
+2025-12-13 20:08:49,046 INFO class    precision   recall       f1  support
+2025-12-13 20:08:49,046 INFO POS         76.96   100.00    86.98      354
+2025-12-13 20:08:49,046 INFO NEU          0.00     0.00     0.00       44
+2025-12-13 20:08:49,046 INFO NEG          0.00     0.00     0.00       62
+2025-12-13 20:08:49,062 INFO save_pretrained failed: The weights trying to be saved contained shared tensors [{'decoder.decoder.embed_tokens.weight', 'encoder.embed_tokens.weight'}] that are mismatching the transformers base configuration. Try saving using `safe_serialization=False`, setting the `_dynamic_tied_weights_keys` attribute for affected modules, or remove this tensor sharing.. Trying fallback save...
+2025-12-13 20:08:49,700 INFO ==================== Epoch 2 =====================
+2025-12-13 20:12:40,224 INFO DEV  aesc_p:53.42 aesc_r:51.79 aesc_f:52.59
+2025-12-13 20:12:40,224 INFO TEST  aesc_p:49.73 aesc_r:49.05 aesc_f:49.39
+2025-12-13 20:12:40,224 INFO DEV  ae_p:66.89 ae_r:64.86 ae_f:65.86  sc_p:26.62 sc_r:33.33 sc_f:29.6 sc_acc:79.86
+2025-12-13 20:12:40,224 INFO TEST  ae_p:64.9 ae_r:64.02 ae_f:64.46  sc_p:25.54 sc_r:33.33 sc_f:28.92 sc_acc:76.62
+2025-12-13 20:12:40,224 INFO Sentiment classification report (DEV):
+2025-12-13 20:12:40,224 INFO class    precision   recall       f1  support
+2025-12-13 20:12:40,224 INFO POS         79.86   100.00    88.80      563
+2025-12-13 20:12:40,224 INFO NEU          0.00     0.00     0.00       41
+2025-12-13 20:12:40,224 INFO NEG          0.00     0.00     0.00      101
+2025-12-13 20:12:40,224 INFO Sentiment classification report (TEST):
+2025-12-13 20:12:40,224 INFO class    precision   recall       f1  support
+2025-12-13 20:12:40,224 INFO POS         76.62   100.00    86.76      544
+2025-12-13 20:12:40,224 INFO NEU          0.00     0.00     0.00       59
+2025-12-13 20:12:40,224 INFO NEG          0.00     0.00     0.00      107
+2025-12-13 20:12:40,240 INFO save_pretrained failed: The weights trying to be saved contained shared tensors [{'decoder.decoder.embed_tokens.weight', 'encoder.embed_tokens.weight'}] that are mismatching the transformers base configuration. Try saving using `safe_serialization=False`, setting the `_dynamic_tied_weights_keys` attribute for affected modules, or remove this tensor sharing.. Trying fallback save...
+2025-12-13 20:12:40,928 INFO ==================== Epoch 3 =====================
+2025-12-13 20:16:05,942 INFO DEV  aesc_p:68.46 aesc_r:65.69 aesc_f:67.04
+2025-12-13 20:16:05,942 INFO TEST  aesc_p:66.31 aesc_r:66.73 aesc_f:66.52
+2025-12-13 20:16:05,942 INFO DEV  ae_p:79.29 ae_r:76.08 ae_f:77.65  sc_p:52.29 sc_r:51.8 sc_f:52.05 sc_acc:86.34
+2025-12-13 20:16:05,942 INFO TEST  ae_p:76.25 ae_r:76.74 ae_f:76.49  sc_p:57.23 sc_r:55.95 sc_f:56.59 sc_acc:86.96
+2025-12-13 20:16:05,942 INFO Sentiment classification report (DEV):
+2025-12-13 20:16:05,942 INFO class    precision   recall       f1  support
+2025-12-13 20:16:05,942 INFO POS         88.80    97.74    93.06      665
+2025-12-13 20:16:05,942 INFO NEU          0.00     0.00     0.00       51
+2025-12-13 20:16:05,942 INFO NEG         68.09    57.66    62.44      111
+2025-12-13 20:16:05,942 INFO Sentiment classification report (TEST):
+2025-12-13 20:16:05,942 INFO class    precision   recall       f1  support
+2025-12-13 20:16:05,942 INFO POS         87.25   100.00    93.19      664
+2025-12-13 20:16:05,942 INFO NEU          0.00     0.00     0.00       75
+2025-12-13 20:16:05,942 INFO NEG         84.44    67.86    75.25      112
+2025-12-13 20:16:05,963 INFO save_pretrained failed: The weights trying to be saved contained shared tensors [{'decoder.decoder.embed_tokens.weight', 'encoder.embed_tokens.weight'}] that are mismatching the transformers base configuration. Try saving using `safe_serialization=False`, setting the `_dynamic_tied_weights_keys` attribute for affected modules, or remove this tensor sharing.. Trying fallback save...
+2025-12-13 20:16:06,692 INFO ==================== Epoch 4 =====================
+2025-12-13 20:19:15,535 INFO DEV  aesc_p:70.26 aesc_r:73.69 aesc_f:71.94
+2025-12-13 20:19:15,535 INFO TEST  aesc_p:68.91 aesc_r:74.93 aesc_f:71.79
+2025-12-13 20:19:15,535 INFO DEV  ae_p:80.0 ae_r:83.9 ae_f:81.9  sc_p:62.1 sc_r:64.48 sc_f:63.27 sc_acc:87.83
+2025-12-13 20:19:15,535 INFO TEST  ae_p:76.7 ae_r:83.41 ae_f:79.91  sc_p:73.66 sc_r:70.04 sc_f:71.81 sc_acc:89.84
+2025-12-13 20:19:15,535 INFO Sentiment classification report (DEV):
+2025-12-13 20:19:15,535 INFO class    precision   recall       f1  support
+2025-12-13 20:19:15,535 INFO POS         95.83    93.23    94.51      739
+2025-12-13 20:19:15,535 INFO NEU         26.67    16.33    20.25       49
+2025-12-13 20:19:15,535 INFO NEG         63.80    83.87    72.47      124
+2025-12-13 20:19:15,535 INFO Sentiment classification report (TEST):
+2025-12-13 20:19:15,535 INFO class    precision   recall       f1  support
+2025-12-13 20:19:15,535 INFO POS         93.00    97.10    95.01      725
+2025-12-13 20:19:15,535 INFO NEU         43.24    19.75    27.12       81
+2025-12-13 20:19:15,535 INFO NEG         84.73    93.28    88.80      119
+2025-12-13 20:19:15,557 INFO save_pretrained failed: The weights trying to be saved contained shared tensors [{'decoder.decoder.embed_tokens.weight', 'encoder.embed_tokens.weight'}] that are mismatching the transformers base configuration. Try saving using `safe_serialization=False`, setting the `_dynamic_tied_weights_keys` attribute for affected modules, or remove this tensor sharing.. Trying fallback save...
+2025-12-13 20:19:16,187 INFO ==================== Epoch 5 =====================
+2025-12-13 20:22:32,316 INFO DEV  aesc_p:77.46 aesc_r:77.46 aesc_f:77.46
+2025-12-13 20:22:32,316 INFO TEST  aesc_p:73.95 aesc_r:76.56 aesc_f:75.23
+2025-12-13 20:22:32,316 INFO DEV  ae_p:84.18 ae_r:84.18 ae_f:84.18  sc_p:69.42 sc_r:64.36 sc_f:66.8 sc_acc:92.02
+2025-12-13 20:22:32,316 INFO TEST  ae_p:80.92 ae_r:83.77 ae_f:82.32  sc_p:84.57 sc_r:69.63 sc_f:76.38 sc_acc:91.39
+2025-12-13 20:22:32,316 INFO Sentiment classification report (DEV):
+2025-12-13 20:22:32,316 INFO class    precision   recall       f1  support
+2025-12-13 20:22:32,316 INFO POS         94.51    98.54    96.48      751
+2025-12-13 20:22:32,316 INFO NEU         29.41    10.20    15.15       49
+2025-12-13 20:22:32,316 INFO NEG         84.35    84.35    84.35      115
+2025-12-13 20:22:32,316 INFO Sentiment classification report (TEST):
+2025-12-13 20:22:32,316 INFO class    precision   recall       f1  support
+2025-12-13 20:22:32,316 INFO POS         92.31    99.04    95.55      727
+2025-12-13 20:22:32,316 INFO NEU         73.33    13.92    23.40       79
+2025-12-13 20:22:32,316 INFO NEG         88.06    95.93    91.83      123
+2025-12-13 20:22:32,334 INFO save_pretrained failed: The weights trying to be saved contained shared tensors [{'decoder.decoder.embed_tokens.weight', 'encoder.embed_tokens.weight'}] that are mismatching the transformers base configuration. Try saving using `safe_serialization=False`, setting the `_dynamic_tied_weights_keys` attribute for affected modules, or remove this tensor sharing.. Trying fallback save...
+2025-12-13 20:22:32,935 INFO ==================== Epoch 6 =====================

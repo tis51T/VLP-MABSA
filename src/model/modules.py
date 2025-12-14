@@ -18,7 +18,6 @@ from src.model.modeling_bart import (PretrainedBartModel, BartDecoder,
                                      _prepare_bart_decoder_inputs)
 from src.model.config import MultiModalBartConfig
 from transformers.modeling_outputs import BaseModelOutput
-from similarity_weighting import SimilarityWeighting
 
 
 class ImageEmbedding(nn.Module):
@@ -79,26 +78,6 @@ class MultiModalBartEncoder(nn.Module):
         self.layernorm_embedding = encoder.layernorm_embedding
         # mbart has one extra layer_norm
         self.layer_norm = encoder.layer_norm
-        
-        # Add similarity weighting
-        self.similarity_weighting = SimilarityWeighting(
-            weight=0.5,
-            adaptive_weighting=True,
-            use_attention=True,
-            cache_size=1000,
-            temperature=0.07,
-            multi_scale_crops=False  # We don't have full images, only regions
-        )
-        
-        # Add similarity weighting
-        self.similarity_weighting = SimilarityWeighting(
-            weight=0.5,
-            adaptive_weighting=True,
-            use_attention=True,
-            cache_size=1000,
-            temperature=0.07,
-            multi_scale_crops=False  # We don't have full images, only regions
-        )
 
     def _embed_multi_modal(self, input_ids, image_features):
         """embed textual and visual inputs and combine them into one embedding"""
@@ -147,37 +126,6 @@ class MultiModalBartEncoder(nn.Module):
 
         inputs_embeds = self._embed_multi_modal(
             input_ids, image_features) * self.embed_scale
-        
-        # Apply similarity weighting if texts are provided
-        if texts is not None and len(image_features) > 0:
-            try:
-                # Extract image embeddings for similarity weighting
-                batch_size = input_ids.shape[0]
-                img_mask = (input_ids == self.img_feat_id)
-                
-                # Apply similarity weighting to image regions in embedding space
-                for batch_idx in range(batch_size):
-                    if batch_idx < len(image_features) and len(image_features[batch_idx]) > 0:
-                        # Get image positions for this batch item
-                        img_positions = img_mask[batch_idx].nonzero(as_tuple=True)[0]
-                        if len(img_positions) > 0:
-                            # Extract image embeddings
-                            img_embeds = inputs_embeds[batch_idx, img_positions]  # [num_regions, embed_dim]
-                            
-                            # Apply similarity weighting (using region features as proxy for images)
-                            weighted_embeds = self.similarity_weighting(
-                                img_embeds.unsqueeze(0),  # [1, num_regions, embed_dim] 
-                                image_features[batch_idx:batch_idx+1],  # List of one tensor
-                                texts[batch_idx:batch_idx+1] if isinstance(texts, list) else [texts[batch_idx]]
-                            )
-                            
-                            # Update the embeddings
-                            inputs_embeds[batch_idx, img_positions] = weighted_embeds.squeeze(0)
-            except Exception as e:
-                # If similarity weighting fails, continue without it
-                print(f"Similarity weighting failed: {e}")
-                pass
-        
         embed_pos = self.embed_positions(input_ids)
         x = inputs_embeds + embed_pos
         x = self.layernorm_embedding(x)
@@ -281,12 +229,31 @@ class MultiModalBartDecoder_span(nn.Module
         # print(src_tokens.shape)
         if first is not None:
             src_tokens = src_tokens.gather(index=first, dim=1)
+        
+        # TEMPORARY FIX DISABLED - Testing with properly formatted data
+        # Clamp src_tokens_index to prevent out-of-bounds access
+        # This handles cases where indices reference positions beyond the source sequence length
+        # This can occur due to: 1) data preprocessing issues, 2) generation producing invalid indices
+        # max_valid_index = src_tokens.size(1) - 1
+        # src_tokens_index = torch.clamp(src_tokens_index, 0, max_valid_index)
+        
         word_mapped_tokens = src_tokens.gather(index=src_tokens_index, dim=1)
         #print('word_mapped_tokens', word_mapped_tokens[0])
         tokens = torch.where(mapping_token_mask, tag_mapped_tokens,
                              word_mapped_tokens)
 
         tokens = tokens.masked_fill(tgt_pad_mask, self.pad_token_id)
+        
+        # TEMPORARY FIX DISABLED - Testing with properly formatted data
+        # Clamp tokens to valid vocabulary range to prevent out-of-bounds errors in cross_entropy
+        # Valid token IDs are in range [0, vocab_size-1]
+        # vocab_size = self.decoder.embed_tokens.num_embeddings
+        # Don't clamp the padding token or eos token which might be special values
+        # tokens = torch.where(
+        #     tokens.eq(self.pad_token_id) | tokens.eq(1) | tokens.eq(2),  # preserve special tokens
+        #     tokens,
+        #     torch.clamp(tokens, 0, vocab_size - 1)
+        # )
 
         if self.training:
             tokens = tokens[:, :-1]
@@ -382,7 +349,18 @@ class Span_loss(nn.Module):
         self.fc = nn.LogSoftmax(dim=-1)
 
     def forward(self, tgt_tokens, pred, mask):
-
+        # TEMPORARY FIX DISABLED - Testing with properly formatted data
+        # Clamp target tokens to valid vocabulary range
+        # The prediction has shape [batch, seq_len, vocab_size], so vocab_size is pred.size(-1)
+        # vocab_size = pred.size(-1)
+        # Clamp tokens that aren't padding (-100 is used by PyTorch for ignored indices)
+        # valid_mask = tgt_tokens.ne(-100) & mask.ne(0)
+        # tgt_tokens = torch.where(
+        #     valid_mask,
+        #     torch.clamp(tgt_tokens, 0, vocab_size - 1),
+        #     tgt_tokens
+        # )
+        
         tgt_tokens = tgt_tokens.masked_fill(mask.eq(0), -100)
         output = F.cross_entropy(target=tgt_tokens, input=pred.transpose(1, 2))
         return output

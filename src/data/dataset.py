@@ -146,9 +146,12 @@ class Twitter_Dataset(data.Dataset):
     def get_img_region_box(self, id):
         region_feat = np.load(
             os.path.join(self.img_region_dir + '/_att',
-                         id[:-4] + '.npz'))['feat']
+                        #  id[:-4] + '.npz'))['feat']
+            id + '.npz'))['feat']
         box = np.load(
-            os.path.join(self.img_region_dir + '/_box', id[:-4] + '.npy'))
+            os.path.join(self.img_region_dir + '/_box', 
+                        #  id[:-4] + '.npy'))
+            id + '.npy'))
 
         return region_feat, box
 

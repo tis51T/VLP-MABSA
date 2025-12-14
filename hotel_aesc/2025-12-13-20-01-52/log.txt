@@ -1,0 +1,49 @@
+2025-12-13 20:01:52,546 INFO Made checkpoint directory: "./hotel_best_model_aesc\2025-12-13-20-01-52"
+2025-12-13 20:01:52,546 INFO ============ Initialed with 1 GPU(s) =============
+2025-12-13 20:01:52,546 INFO dataset: [['hotel_review', './src/data/jsons/hotel_info.json']]
+2025-12-13 20:01:52,546 INFO checkpoint_dir: ./hotel_best_model_aesc
+2025-12-13 20:01:52,546 INFO bart_model: facebook/bart-base
+2025-12-13 20:01:52,546 INFO log_dir: hotel_aesc
+2025-12-13 20:01:52,546 INFO model_config: config/pretrain_base.json
+2025-12-13 20:01:52,546 INFO text_only: False
+2025-12-13 20:01:52,546 INFO checkpoint: ./checkpoint/pytorch_model.bin
+2025-12-13 20:01:52,546 INFO lr_decay_every: 4
+2025-12-13 20:01:52,546 INFO lr_decay_ratio: 0.8
+2025-12-13 20:01:52,546 INFO epochs: 20
+2025-12-13 20:01:52,546 INFO eval_every: 1
+2025-12-13 20:01:52,546 INFO lr: 4e-05
+2025-12-13 20:01:52,546 INFO num_beams: 4
+2025-12-13 20:01:52,546 INFO continue_training: False
+2025-12-13 20:01:52,546 INFO warmup: 0.1
+2025-12-13 20:01:52,546 INFO dropout: None
+2025-12-13 20:01:52,562 INFO classif_dropout: None
+2025-12-13 20:01:52,562 INFO attention_dropout: None
+2025-12-13 20:01:52,562 INFO activation_dropout: None
+2025-12-13 20:01:52,562 INFO grad_clip: 5.0
+2025-12-13 20:01:52,562 INFO gpu_num: 1
+2025-12-13 20:01:52,562 INFO cpu: False
+2025-12-13 20:01:52,562 INFO amp: False
+2025-12-13 20:01:52,562 INFO master_port: 12355
+2025-12-13 20:01:52,562 INFO batch_size: 8
+2025-12-13 20:01:52,562 INFO seed: 2026
+2025-12-13 20:01:52,562 INFO num_workers: 0
+2025-12-13 20:01:52,562 INFO max_len: 10
+2025-12-13 20:01:52,562 INFO max_len_a: 0.6
+2025-12-13 20:01:52,562 INFO bart_init: 1
+2025-12-13 20:01:52,562 INFO check_info: 
+2025-12-13 20:01:52,562 INFO is_check: 1
+2025-12-13 20:01:52,562 INFO task: 
+2025-12-13 20:01:52,562 INFO Loading model...
+2025-12-13 20:01:52,562 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2025-12-13 20:01:52,748 WARNING '(MaxRetryError("HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /facebook/bart-base/resolve/main/tokenizer_config.json (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 407 Proxy Authentication Required')))"), '(Request ID: 91344d1a-5ad3-4bd1-8953-cfbdc9688dfe)')' thrown while requesting HEAD https://huggingface.co/facebook/bart-base/resolve/main/tokenizer_config.json
+2025-12-13 20:01:52,748 WARNING Retrying in 1s [Retry 1/5].
+2025-12-13 20:01:53,755 DEBUG Starting new HTTPS connection (2): huggingface.co:443
+2025-12-13 20:01:53,852 WARNING '(MaxRetryError("HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /facebook/bart-base/resolve/main/tokenizer_config.json (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 407 Proxy Authentication Required')))"), '(Request ID: a0babf20-0140-4905-8941-a51430fd28c3)')' thrown while requesting HEAD https://huggingface.co/facebook/bart-base/resolve/main/tokenizer_config.json
+2025-12-13 20:01:53,852 WARNING Retrying in 2s [Retry 2/5].
+2025-12-13 20:01:55,854 DEBUG Starting new HTTPS connection (3): huggingface.co:443
+2025-12-13 20:01:55,982 WARNING '(MaxRetryError("HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /facebook/bart-base/resolve/main/tokenizer_config.json (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 407 Proxy Authentication Required')))"), '(Request ID: ed1c54ac-8b68-4f97-a188-31932a5f4d66)')' thrown while requesting HEAD https://huggingface.co/facebook/bart-base/resolve/main/tokenizer_config.json
+2025-12-13 20:01:55,982 WARNING Retrying in 4s [Retry 3/5].
+2025-12-13 20:01:59,985 DEBUG Starting new HTTPS connection (4): huggingface.co:443
+2025-12-13 20:02:00,082 WARNING '(MaxRetryError("HTTPSConnectionPool(host='huggingface.co', port=443): Max retries exceeded with url: /facebook/bart-base/resolve/main/tokenizer_config.json (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 407 Proxy Authentication Required')))"), '(Request ID: fb2902b8-ab0b-4a34-bcc1-8e7d21b6672b)')' thrown while requesting HEAD https://huggingface.co/facebook/bart-base/resolve/main/tokenizer_config.json
+2025-12-13 20:02:00,082 WARNING Retrying in 8s [Retry 4/5].
+2025-12-13 20:02:08,087 DEBUG Starting new HTTPS connection (5): huggingface.co:443

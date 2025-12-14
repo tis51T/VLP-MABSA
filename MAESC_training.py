@@ -39,6 +39,8 @@ def main(rank, args):
         os.makedirs(log_dir)
         tb_writer = SummaryWriter(log_dir=log_dir)
 
+    
+
     logger = Logger(log_dir=os.path.join(log_dir, 'log.txt'),
                     enabled=(rank == 0))
 
@@ -173,14 +175,27 @@ def main(rank, args):
                              collate_fn=collate_aesc)
 
     callback = None
+    # build id->name mapping for metric debug (prefer mapping2targetid if available)
+    if hasattr(tokenizer, 'mapping2targetid') and tokenizer.mapping2targetid:
+        id2label = {v: k for k, v in tokenizer.mapping2targetid.items()}
+    else:
+        id2label = {v: k for k, v in tokenizer.mapping2id.items()}
+
+    # create metric (debug disabled to avoid verbose per-sample logs)
     metric = AESCSpanMetric(eos_token_id,
                             num_labels=len(label_ids),
-                            conflict_id=-1)
+                            conflict_id=-1,
+                            id2label=id2label,
+                            debug=False,
+                            debug_samples_limit=50)
     model.train()
     start = datetime.now()
     best_dev_res = None
     best_dev_test_res = None
     best_test_res = None
+    # track best IoU values (per-sample averaged IoU)
+    best_dev_iou = None
+    best_test_iou = None
     # res_dev = eval_utils.eval(model, dev_loader, metric, device)
     while epoch < args.epochs:
         logger.info('Epoch {}'.format(epoch + 1), pad=True)
@@ -213,47 +228,171 @@ def main(rank, args):
                 res_test['aesc_pre'], res_test['aesc_rec'],
                 res_test['aesc_f']))
 
+            # Also log sentiment classification (SC) and aspect extraction (AE) metrics
+            try:
+                dev_log = (
+                    'DEV  ae_p:{ae_pre} ae_r:{ae_rec} ae_f:{ae_f}'
+                    '  sc_p:{sc_pre} sc_r:{sc_rec} sc_f:{sc_f} sc_acc:{sc_acc} iou:{iou}'
+                ).format(ae_pre=res_dev.get('ae_pre', 'N/A'),
+                         ae_rec=res_dev.get('ae_rec', 'N/A'),
+                         ae_f=res_dev.get('ae_f', 'N/A'),
+                         sc_pre=res_dev.get('sc_pre', 'N/A'),
+                         sc_rec=res_dev.get('sc_rec', 'N/A'),
+                         sc_f=res_dev.get('sc_f', 'N/A'),
+                         sc_acc=res_dev.get('sc_acc', 'N/A'),
+                         iou=res_dev.get('iou', 'N/A'))
+                test_log = (
+                    'TEST  ae_p:{ae_pre} ae_r:{ae_rec} ae_f:{ae_f}'
+                    '  sc_p:{sc_pre} sc_r:{sc_rec} sc_f:{sc_f} sc_acc:{sc_acc} iou:{iou}'
+                ).format(ae_pre=res_test.get('ae_pre', 'N/A'),
+                         ae_rec=res_test.get('ae_rec', 'N/A'),
+                         ae_f=res_test.get('ae_f', 'N/A'),
+                         sc_pre=res_test.get('sc_pre', 'N/A'),
+                         sc_rec=res_test.get('sc_rec', 'N/A'),
+                         sc_f=res_test.get('sc_f', 'N/A'),
+                         sc_acc=res_test.get('sc_acc', 'N/A'),
+                         iou=res_test.get('iou', 'N/A'))
+
+                logger.info(dev_log)
+                logger.info(test_log)
+
+                # Build and log a per-class classification report for sentiment (DEV)
+                try:
+                    sc_tp = res_dev.get('sc_tp_counts', {})
+                    sc_fp = res_dev.get('sc_fp_counts', {})
+                    sc_fn = res_dev.get('sc_fn_counts', {})
+                    if sc_tp or sc_fp or sc_fn:
+                        # mapping2targetid maps class name -> small ids used in metrics; prefer that
+                        if hasattr(tokenizer, 'mapping2targetid') and tokenizer.mapping2targetid:
+                            id2name = {v: k for k, v in tokenizer.mapping2targetid.items()}
+                        else:
+                            id2name = {v: k for k, v in tokenizer.mapping2id.items()}
+                        all_tags = set(list(sc_tp.keys()) + list(sc_fp.keys()) + list(sc_fn.keys()))
+                        logger.info('Sentiment classification report (DEV):')
+                        logger.info('{:<8} {:>8} {:>8} {:>8} {:>8}'.format('class','precision','recall','f1','support'))
+                        for tag in sorted(all_tags):
+                            tp = sc_tp.get(tag, 0)
+                            fp = sc_fp.get(tag, 0)
+                            fn = sc_fn.get(tag, 0)
+                            prec = tp / (tp + fp + 1e-13)
+                            rec = tp / (tp + fn + 1e-13)
+                            f1 = 2 * prec * rec / (prec + rec + 1e-13)
+                            support = int(tp + fn)
+                            name = id2name.get(int(tag), str(tag))
+                            logger.info('{:<8} {:8.2f} {:8.2f} {:8.2f} {:8d}'.format(name, prec*100, rec*100, f1*100, support))
+                except Exception:
+                    logger.info('Could not build detailed DEV sentiment report')
+
+                # Build and log a per-class classification report for sentiment (TEST)
+                try:
+                    sc_tp = res_test.get('sc_tp_counts', {})
+                    sc_fp = res_test.get('sc_fp_counts', {})
+                    sc_fn = res_test.get('sc_fn_counts', {})
+                    if sc_tp or sc_fp or sc_fn:
+                        if hasattr(tokenizer, 'mapping2targetid') and tokenizer.mapping2targetid:
+                            id2name = {v: k for k, v in tokenizer.mapping2targetid.items()}
+                        else:
+                            id2name = {v: k for k, v in tokenizer.mapping2id.items()}
+                        all_tags = set(list(sc_tp.keys()) + list(sc_fp.keys()) + list(sc_fn.keys()))
+                        logger.info('Sentiment classification report (TEST):')
+                        logger.info('{:<8} {:>8} {:>8} {:>8} {:>8}'.format('class','precision','recall','f1','support'))
+                        for tag in sorted(all_tags):
+                            tp = sc_tp.get(tag, 0)
+                            fp = sc_fp.get(tag, 0)
+                            fn = sc_fn.get(tag, 0)
+                            prec = tp / (tp + fp + 1e-13)
+                            rec = tp / (tp + fn + 1e-13)
+                            f1 = 2 * prec * rec / (prec + rec + 1e-13)
+                            support = int(tp + fn)
+                            name = id2name.get(int(tag), str(tag))
+                            logger.info('{:<8} {:8.2f} {:8.2f} {:8.2f} {:8d}'.format(name, prec*100, rec*100, f1*100, support))
+                except Exception:
+                    logger.info('Could not build detailed TEST sentiment report')
+
+                # TensorBoard logging
+                if tb_writer is not None:
+                    # DEV
+                    if isinstance(res_dev.get('aesc_f', None), (int, float)):
+                        tb_writer.add_scalar('dev/aesc_f', res_dev['aesc_f'], epoch)
+                    if isinstance(res_dev.get('sc_f', None), (int, float)):
+                        tb_writer.add_scalar('dev/sc_f', res_dev['sc_f'], epoch)
+                    if isinstance(res_dev.get('sc_acc', None), (int, float)):
+                        tb_writer.add_scalar('dev/sc_acc', res_dev['sc_acc'], epoch)
+                    # TEST
+                    if isinstance(res_test.get('aesc_f', None), (int, float)):
+                        tb_writer.add_scalar('test/aesc_f', res_test['aesc_f'], epoch)
+                    if isinstance(res_test.get('sc_f', None), (int, float)):
+                        tb_writer.add_scalar('test/sc_f', res_test['sc_f'], epoch)
+                    if isinstance(res_test.get('sc_acc', None), (int, float)):
+                        tb_writer.add_scalar('test/sc_acc', res_test['sc_acc'], epoch)
+            except Exception as e:
+                logger.info('Failed to log full metrics: {}'.format(e))
+
+            
+
             save_flag = False
+            # update best dev result if AESC F or IoU improves
             if best_dev_res is None:
                 best_dev_res = res_dev
                 best_dev_test_res = res_test
-
+                best_dev_iou = res_dev.get('iou', 0.0)
             else:
-                if best_dev_res['aesc_f'] < res_dev['aesc_f']:
+                dev_iou = res_dev.get('iou', 0.0)
+                if res_dev['aesc_f'] > best_dev_res.get('aesc_f', -1) or (best_dev_iou is None or dev_iou > best_dev_iou):
                     best_dev_res = res_dev
                     best_dev_test_res = res_test
+                    best_dev_iou = dev_iou
 
+            # update best test result and decide save based on AESC F or IoU improvement
             if best_test_res is None:
                 best_test_res = res_test
+                best_test_iou = res_test.get('iou', 0.0)
                 save_flag = True
             else:
-                if best_test_res['aesc_f'] < res_test['aesc_f']:
+                test_iou = res_test.get('iou', 0.0)
+                if res_test['aesc_f'] > best_test_res.get('aesc_f', -1) or (best_test_iou is None or test_iou > best_test_iou):
                     best_test_res = res_test
+                    best_test_iou = test_iou
                     save_flag = True
 
             if args.is_check == 1 and save_flag:
                 current_checkpoint_path = os.path.join(checkpoint_path,
                                                        args.check_info)
-                model.seq2seq_model.save_pretrained(current_checkpoint_path)
+                try:
+                    model.seq2seq_model.save_pretrained(current_checkpoint_path)
+                except RuntimeError as e:
+                    logger.info(f'save_pretrained failed: {e}. Trying fallback save...')
+                    # Try using safe_serialization=False if transformers supports it
+                    try:
+                        model.seq2seq_model.save_pretrained(current_checkpoint_path, safe_serialization=False)
+                    except TypeError:
+                        # Fallback: manual save of state_dict and config
+                        os.makedirs(current_checkpoint_path, exist_ok=True)
+                        torch.save(model.seq2seq_model.state_dict(),
+                                   os.path.join(current_checkpoint_path, 'pytorch_model.bin'))
+                        if hasattr(model.seq2seq_model, 'config') and model.seq2seq_model.config is not None:
+                            with open(os.path.join(current_checkpoint_path, 'config.json'), 'w') as fh:
+                                fh.write(model.seq2seq_model.config.to_json_string())
+                        logger.info('Manual checkpoint write complete.')
                 print('save model!!!!!!!!!!!')
         epoch += 1
     logger.info("Training complete in: " + str(datetime.now() - start),
                 pad=True)
     logger.info('---------------------------')
     logger.info('BEST DEV:-----')
-    logger.info('BEST DEV  aesc_p:{} aesc_r:{} aesc_f:{}'.format(
+    logger.info('BEST DEV  aesc_p:{} aesc_r:{} aesc_f:{} iou:{}'.format(
         best_dev_res['aesc_pre'], best_dev_res['aesc_rec'],
-        best_dev_res['aesc_f']))
+        best_dev_res['aesc_f'], best_dev_res.get('iou', 'N/A')))
 
     logger.info('BEST DEV TEST:-----')
-    logger.info('BEST DEV--TEST  aesc_p:{} aesc_r:{} aesc_f:{}'.format(
+    logger.info('BEST DEV--TEST  aesc_p:{} aesc_r:{} aesc_f:{} iou:{}'.format(
         best_dev_test_res['aesc_pre'], best_dev_test_res['aesc_rec'],
-        best_dev_test_res['aesc_f']))
+        best_dev_test_res['aesc_f'], best_dev_test_res.get('iou', 'N/A')))
 
     logger.info('BEST TEST:-----')
-    logger.info('BEST TEST  aesc_p:{} aesc_r:{} aesc_f:{}'.format(
+    logger.info('BEST TEST  aesc_p:{} aesc_r:{} aesc_f:{} iou:{}'.format(
         best_test_res['aesc_pre'], best_test_res['aesc_rec'],
-        best_test_res['aesc_f']))
+        best_test_res['aesc_f'], best_test_res.get('iou', 'N/A')))
 
     # if not args.cpu:
     #     cleanup_process()

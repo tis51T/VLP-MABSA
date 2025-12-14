@@ -1,6 +1,6 @@
 data/
 !src/data/
-checkpoint/
+pytorch_model.bin
 __pycache__/
 15_aesc/
 15_sc/
